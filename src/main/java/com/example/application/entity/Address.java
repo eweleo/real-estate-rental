@@ -10,10 +10,7 @@ import lombok.Setter;
 @Setter
 @Getter
 @Entity
-public class Address {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class Address extends AbstractEntity{
     private String street;
     private String streetNumber;
     private String apartmentNumber;

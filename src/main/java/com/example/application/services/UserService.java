@@ -1,7 +1,7 @@
 package com.example.application.services;
 
-import com.example.application.data.User;
-import com.example.application.data.UserRepository;
+import com.example.application.entity.User;
+import com.example.application.repository.UserRepository;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

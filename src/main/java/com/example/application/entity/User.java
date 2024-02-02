@@ -1,17 +1,12 @@
-package com.example.application.data;
+package com.example.application.entity;
 
+import com.example.application.data.Role;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.Column;
-import jakarta.persistence.ElementCollection;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.Lob;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.List;
 import java.util.Set;
 @Getter
 @Setter
@@ -29,4 +24,12 @@ public class User extends AbstractEntity {
     @Lob
     @Column(length = 1000000)
     private byte[] profilePicture;
+        private String Firstname;
+    private String Lastname;
+    private String email;
+    private String telephoneNumber;
+    @OneToMany(mappedBy = "owner")
+    private List<Apartment> offers;
+    @OneToMany
+    private List<Apartment> observed;
 }

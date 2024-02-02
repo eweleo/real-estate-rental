@@ -1,11 +1,10 @@
 package com.example.application.views;
 
-import com.example.application.data.User;
+import com.example.application.entity.User;
 import com.example.application.security.AuthenticatedUser;
 import com.example.application.views.mojedane.MojedaneView;
 import com.example.application.views.myoffers.MyOffersView;
 import com.example.application.views.mojeulubione.MojeulubioneView;
-import com.example.application.views.offers.OffersView;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.applayout.AppLayout;
@@ -17,7 +16,6 @@ import com.vaadin.flow.component.menubar.MenuBar;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.router.RouterLink;
 import com.vaadin.flow.server.StreamResource;
-import com.vaadin.flow.server.VaadinService;
 import com.vaadin.flow.server.auth.AccessAnnotationChecker;
 import com.vaadin.flow.theme.lumo.LumoUtility.AlignItems;
 import com.vaadin.flow.theme.lumo.LumoUtility.BoxSizing;
@@ -36,19 +34,15 @@ import com.vaadin.flow.theme.lumo.LumoUtility.Whitespace;
 import com.vaadin.flow.theme.lumo.LumoUtility.Width;
 
 import java.io.ByteArrayInputStream;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
-import org.apache.catalina.webresources.FileResource;
-import org.vaadin.lineawesome.LineAwesomeIcon;
 
 /**
  * The main view is a top-level placeholder for other views.
  */
 public class MainLayout extends AppLayout {
 
-    private static final String URL = "/META-INF/resource/icons/baner.png";
+    private static final String URL = "/META-INF/resources/icons/baner.png";
 
     /**
      * A simple navigation item component, based on ListItem element.
@@ -127,6 +121,10 @@ public class MainLayout extends AppLayout {
             div.getElement().getStyle().set("align-items", "center");
             div.getElement().getStyle().set("gap", "var(--lumo-space-s)");
             userName.add(div);
+
+            userName.getSubMenu().addItem("Moje dane", e-> UI.getCurrent().navigate(MojedaneView.class));
+            userName.getSubMenu().addItem("Moje ulubione", e-> UI.getCurrent().navigate(MojeulubioneView.class));
+            userName.getSubMenu().addItem("Historia wynajmów", e -> UI.getCurrent().navigate(MyOffersView.class));
             userName.getSubMenu().addItem("Wyloguj się", e -> {
                 authenticatedUser.logout();
             });
@@ -145,30 +143,13 @@ public class MainLayout extends AppLayout {
         list.addClassNames(Display.FLEX, Gap.SMALL, ListStyleType.NONE, Margin.NONE, Padding.NONE);
         nav.add(list);
 
-        for (MenuItemInfo menuItem : createMenuItems(maybeUser)) {
-            if (accessChecker.hasAccess(menuItem.getView())) {
-                list.add(menuItem);
-            }
-
-        }
-        String basepath = VaadinService.getCurrent().get
-        FileResource
-        Image image = new Image();
-        image.setSrc(URL);
+        StreamResource imageResource = new StreamResource("baner.png",
+                () -> getClass().getResourceAsStream(URL));
+        Image image = new Image(imageResource,"baner");
         image.setWidth("100%");
         header.add(layout, nav, new HorizontalLayout(image));
         return header;
     }
 
-    private List<MenuItemInfo> createMenuItems(Optional<User> maybeUser) {
-        List<MenuItemInfo> menu = new ArrayList<>();
-        menu.add(new MenuItemInfo("Oferty", LineAwesomeIcon.ANGLE_RIGHT_SOLID.create(), OffersView.class));
-        if (maybeUser.isPresent()) {
-            menu.add(new MenuItemInfo("Moje oferty", LineAwesomeIcon.ANGLE_RIGHT_SOLID.create(), MyOffersView.class));
-            menu.add(new MenuItemInfo("Moje ulubione", LineAwesomeIcon.ANGLE_RIGHT_SOLID.create(), MojeulubioneView.class));
-            menu.add(new MenuItemInfo("Moje dane", LineAwesomeIcon.ANGLE_RIGHT_SOLID.create(), MojedaneView.class));
-        }
-        return menu;
-    }
 }
 

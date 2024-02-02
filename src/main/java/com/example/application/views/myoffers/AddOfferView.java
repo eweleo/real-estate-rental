@@ -14,4 +14,5 @@ import jakarta.annotation.security.PermitAll;
 @PermitAll
 @Uses(Icon.class)
 public class AddOfferView extends Composite<VerticalLayout> {
+
 }

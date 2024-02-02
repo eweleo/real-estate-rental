@@ -11,19 +11,17 @@ import java.util.UUID;
 @Setter
 @Getter
 @Entity
-public class Apartment {
-    @Id
-    private UUID id = UUID.randomUUID();
-    private List<Category> category;
+public class Apartment extends  AbstractEntity{
+    private UUID uuid = UUID.randomUUID();
+    private String title;
     private String description;
     private Float area;
     private Integer roomsNumber;
     private Integer floor;
     private Float price;
-    @Lob
-    private byte[] image;
+    private String imageURL;
     @OneToOne
     private Address address;
     @ManyToOne
-    private Customer owner;
+    private User owner;
 }
