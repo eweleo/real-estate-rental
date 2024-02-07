@@ -16,4 +16,8 @@ public class ApartmentService {
     public List<Apartment> findAll(){
         return apartmentRepository.findAll();
     }
+
+    public Apartment getByUuid(String uuid){
+        return apartmentRepository.findByUuid(uuid);
+    }
 }

@@ -2,9 +2,11 @@ package com.example.application.entity;
 
 import com.example.application.model.Category;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Max;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.text.DecimalFormat;
 import java.util.List;
 import java.util.UUID;
 
@@ -12,16 +14,14 @@ import java.util.UUID;
 @Getter
 @Entity
 public class Apartment extends  AbstractEntity{
-    private UUID uuid = UUID.randomUUID();
+    private String uuid;
     private String title;
+    @Column(length = 4000)
     private String description;
-    private Float area;
+    private Integer maxPerson;
     private Integer roomsNumber;
-    private Integer floor;
-    private Float price;
+    private Double price;
     private String imageURL;
-    @OneToOne
-    private Address address;
     @ManyToOne
-    private User owner;
+    private Address address;
 }

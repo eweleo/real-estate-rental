@@ -2,11 +2,8 @@ package com.example.application.views;
 
 import com.example.application.entity.User;
 import com.example.application.security.AuthenticatedUser;
-import com.example.application.views.mojedane.MojedaneView;
-import com.example.application.views.myoffers.MyOffersView;
-import com.example.application.views.mojeulubione.MojeulubioneView;
+import com.example.application.views.offers.OffersView;
 import com.vaadin.flow.component.Component;
-import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.avatar.Avatar;
 import com.vaadin.flow.component.contextmenu.MenuItem;
@@ -17,21 +14,7 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.router.RouterLink;
 import com.vaadin.flow.server.StreamResource;
 import com.vaadin.flow.server.auth.AccessAnnotationChecker;
-import com.vaadin.flow.theme.lumo.LumoUtility.AlignItems;
-import com.vaadin.flow.theme.lumo.LumoUtility.BoxSizing;
-import com.vaadin.flow.theme.lumo.LumoUtility.Display;
-import com.vaadin.flow.theme.lumo.LumoUtility.FlexDirection;
-import com.vaadin.flow.theme.lumo.LumoUtility.FontSize;
-import com.vaadin.flow.theme.lumo.LumoUtility.FontWeight;
-import com.vaadin.flow.theme.lumo.LumoUtility.Gap;
-import com.vaadin.flow.theme.lumo.LumoUtility.Height;
-import com.vaadin.flow.theme.lumo.LumoUtility.ListStyleType;
-import com.vaadin.flow.theme.lumo.LumoUtility.Margin;
-import com.vaadin.flow.theme.lumo.LumoUtility.Overflow;
-import com.vaadin.flow.theme.lumo.LumoUtility.Padding;
-import com.vaadin.flow.theme.lumo.LumoUtility.TextColor;
-import com.vaadin.flow.theme.lumo.LumoUtility.Whitespace;
-import com.vaadin.flow.theme.lumo.LumoUtility.Width;
+import com.vaadin.flow.theme.lumo.LumoUtility.*;
 
 import java.io.ByteArrayInputStream;
 import java.util.Optional;
@@ -95,14 +78,17 @@ public class MainLayout extends AppLayout {
         layout.addClassNames(Display.FLEX, AlignItems.CENTER, Padding.Horizontal.LARGE);
 
         H1 appName = new H1("Nieruchomości");
+        RouterLink link = new RouterLink("Nieruchomości", OffersView.class);
+        link.addClassNames(Margin.Vertical.MEDIUM, Margin.End.AUTO, FontSize.XXXLARGE, FontWeight.EXTRABOLD);
+
         appName.addClassNames(Margin.Vertical.MEDIUM, Margin.End.AUTO, FontSize.XXXLARGE, FontWeight.EXTRABOLD);
-        layout.add(appName);
+        layout.add(link);
 
         Optional<User> maybeUser = authenticatedUser.get();
         if (maybeUser.isPresent()) {
             User user = maybeUser.get();
 
-            Avatar avatar = new Avatar(user.getName());
+            Avatar avatar = new Avatar(user.getFirstName() + " " + user.getLastName());
             StreamResource resource = new StreamResource("profile-pic",
                     () -> new ByteArrayInputStream(user.getProfilePicture()));
             avatar.setImageResource(resource);
@@ -115,16 +101,16 @@ public class MainLayout extends AppLayout {
             MenuItem userName = userMenu.addItem("");
             Div div = new Div();
             div.add(avatar);
-            div.add(user.getName());
+            div.add(user.getFirstName() + " " + user.getLastName());
             div.add(new Icon("lumo", "dropdown"));
             div.getElement().getStyle().set("display", "flex");
             div.getElement().getStyle().set("align-items", "center");
             div.getElement().getStyle().set("gap", "var(--lumo-space-s)");
             userName.add(div);
 
-            userName.getSubMenu().addItem("Moje dane", e-> UI.getCurrent().navigate(MojedaneView.class));
-            userName.getSubMenu().addItem("Moje ulubione", e-> UI.getCurrent().navigate(MojeulubioneView.class));
-            userName.getSubMenu().addItem("Historia wynajmów", e -> UI.getCurrent().navigate(MyOffersView.class));
+//            userName.getSubMenu().addItem("Moje dane", e-> UI.getCurrent().navigate(MojedaneView.class));
+//            userName.getSubMenu().addItem("Moje ulubione", e-> UI.getCurrent().navigate(MojeulubioneView.class));
+//            userName.getSubMenu().addItem("Historia wynajmów", e -> UI.getCurrent().navigate(MyOffersView.class));
             userName.getSubMenu().addItem("Wyloguj się", e -> {
                 authenticatedUser.logout();
             });
@@ -145,7 +131,7 @@ public class MainLayout extends AppLayout {
 
         StreamResource imageResource = new StreamResource("baner.png",
                 () -> getClass().getResourceAsStream(URL));
-        Image image = new Image(imageResource,"baner");
+        Image image = new Image(imageResource, "baner");
         image.setWidth("100%");
         header.add(layout, nav, new HorizontalLayout(image));
         return header;

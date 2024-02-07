@@ -15,7 +15,7 @@ import java.util.Set;
 public class User extends AbstractEntity {
 
     private String username;
-    private String name;
+
     @JsonIgnore
     private String hashedPassword;
     @Enumerated(EnumType.STRING)
@@ -24,12 +24,10 @@ public class User extends AbstractEntity {
     @Lob
     @Column(length = 1000000)
     private byte[] profilePicture;
-        private String Firstname;
-    private String Lastname;
+        private String FirstName;
+    private String LastName;
     private String email;
     private String telephoneNumber;
-    @OneToMany(mappedBy = "owner")
-    private List<Apartment> offers;
     @OneToMany
     private List<Apartment> observed;
 }
