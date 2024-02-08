@@ -8,14 +8,13 @@ import lombok.Setter;
 
 import java.util.List;
 import java.util.Set;
+
 @Getter
 @Setter
 @Entity
 @Table(name = "application_user")
 public class User extends AbstractEntity {
-
     private String username;
-
     @JsonIgnore
     private String hashedPassword;
     @Enumerated(EnumType.STRING)
@@ -24,7 +23,7 @@ public class User extends AbstractEntity {
     @Lob
     @Column(length = 1000000)
     private byte[] profilePicture;
-        private String FirstName;
+    private String FirstName;
     private String LastName;
     private String email;
     private String telephoneNumber;

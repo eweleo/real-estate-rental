@@ -32,15 +32,14 @@ public class OfferView extends Div implements HasUrlParameter<String>, BeforeEnt
         this.apartmentService = apartmentService;
     }
 
-    private final Button reserve = new Button("Zarezerwuj");
+    private final Button reserveButton = new Button("Zarezerwuj");
 
     private void  configListener(){
-        reserve.addClickListener(event -> UI.getCurrent().navigate(CheckoutFormView.class, apartment.getUuid()));
+        reserveButton.addClickListener(event -> UI.getCurrent().navigate(CheckoutFormView.class, apartment.getUuid()));
     }
 
     private void configView() {
 
-        addClassNames("checkout-form-view");
         addClassNames(Display.FLEX, FlexDirection.COLUMN, Height.FULL);
 
         Main content = new Main();
@@ -52,7 +51,7 @@ public class OfferView extends Div implements HasUrlParameter<String>, BeforeEnt
         add(content);
     }
 
-    private Aside createAside() {
+    private Aside createDetailsLayout() {
         Aside aside = new Aside();
         aside.addClassNames(Background.CONTRAST_5, BoxSizing.BORDER, Padding.LARGE, BorderRadius.LARGE,
                 Position.STICKY);
@@ -60,17 +59,16 @@ public class OfferView extends Div implements HasUrlParameter<String>, BeforeEnt
         UnorderedList ul = new UnorderedList();
         ul.addClassNames(ListStyleType.NONE, Margin.NONE, Padding.NONE, Display.FLEX, FlexDirection.COLUMN, Gap.MEDIUM);
 
-
         ul.add(createListItem(new Icon(VaadinIcon.USERS), "Maksymalna ilość osób", apartment.getMaxPerson().toString()));
         ul.add(createListItem(new Icon(VaadinIcon.BED), "Ilość łóżek", apartment.getRoomsNumber().toString()));
         ul.add(createListItem(new Icon(VaadinIcon.DOLLAR), "Cena za noc", apartment.getPrice() + " zł"));
         ul.add(createListItem(new Icon(VaadinIcon.MAP_MARKER), "", apartment.getAddress().getCity()));
 
         aside.add(ul);
-        reserve.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        reserveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         Footer headerSection = new Footer();
         headerSection.addClassNames(Display.FLEX, AlignItems.END, JustifyContent.BETWEEN, Margin.Top.XLARGE, Margin.Left.XLARGE);
-        headerSection.add(reserve);
+        headerSection.add(reserveButton);
         aside.add(headerSection);
 
         return aside;
@@ -91,7 +89,7 @@ public class OfferView extends Div implements HasUrlParameter<String>, BeforeEnt
         image.setWidth("70%");
 
 
-        checkoutForm.add(new HorizontalLayout(image, createAside()));
+        checkoutForm.add(new HorizontalLayout(image, createDetailsLayout()));
         checkoutForm.add(new Hr());
         Paragraph description = new Paragraph(apartment.getDescription());
         description.addClassName(LumoUtility.Margin.Vertical.MEDIUM);

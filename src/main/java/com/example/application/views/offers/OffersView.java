@@ -2,6 +2,8 @@ package com.example.application.views.offers;
 
 
 import com.example.application.entity.Apartment;
+import com.example.application.entity.Reservation;
+import com.example.application.security.ReservationService;
 import com.example.application.services.ApartmentService;
 import com.example.application.views.MainLayout;
 import com.vaadin.flow.component.HasComponents;
@@ -13,12 +15,10 @@ import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.dependency.Uses;
 import com.vaadin.flow.component.formlayout.FormLayout;
-import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Main;
 import com.vaadin.flow.component.html.OrderedList;
 import com.vaadin.flow.component.html.UnorderedList;
 import com.vaadin.flow.component.icon.Icon;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.BeforeEnterObserver;
@@ -28,7 +28,6 @@ import com.vaadin.flow.server.auth.AnonymousAllowed;
 import com.vaadin.flow.theme.lumo.LumoUtility.*;
 
 import java.util.List;
-import java.util.function.Predicate;
 
 @PageTitle("Oferty")
 @Route(value = "", layout = MainLayout.class)
@@ -40,11 +39,11 @@ public class OffersView extends Main implements HasComponents, HasStyle, BeforeE
     private OrderedList imageContainer = new OrderedList();
     private final DatePicker dateFrom = new DatePicker();
     private final DatePicker dataTo = new DatePicker();
-    private final ComboBox cityBox = new ComboBox<>();
+    private final ComboBox<String> cityBox = new ComboBox<>();
     private final NumberField countPerson = new NumberField();
     private final Button searchButton = new Button("Szukaj");
 
-    public OffersView(ApartmentService apartmentService) {
+    public OffersView(ApartmentService apartmentService, ReservationService reservationService) {
         this.apartmentService = apartmentService;
     }
 
@@ -53,11 +52,10 @@ public class OffersView extends Main implements HasComponents, HasStyle, BeforeE
         addClassNames("image-gallery-view");
         addClassNames(MaxWidth.SCREEN_LARGE, Margin.Horizontal.AUTO, Padding.Bottom.LARGE, Padding.Horizontal.LARGE);
 
-
         imageContainer = new OrderedList();
-        imageContainer.addClassNames(Gap.MEDIUM, Display.GRID, ListStyleType.NONE, Margin.Bottom.NONE,Margin.Top.XLARGE, Padding.NONE);
+        imageContainer.addClassNames(Gap.MEDIUM, Display.GRID, ListStyleType.NONE, Margin.Bottom.NONE, Margin.Top.XLARGE, Padding.NONE);
 
-        add(getFilterLayout(),imageContainer);
+        add(getFilterLayout(), imageContainer);
 
     }
 
@@ -75,19 +73,18 @@ public class OffersView extends Main implements HasComponents, HasStyle, BeforeE
         dataTo.setPlaceholder("Data wymeldowania");
         configureComboBoxCity();
 
-
         countPerson.setStep(1);
         countPerson.setStepButtonsVisible(true);
         countPerson.setPlaceholder("Ilość osób");
 
         searchButton.addThemeVariants(ButtonVariant.MATERIAL_OUTLINED, ButtonVariant.LUMO_PRIMARY);
-        filterLayout.add(cityBox, dateFrom,new Text("-"), dataTo, countPerson, searchButton);
+        filterLayout.add(cityBox, dateFrom, new Text("-"), dataTo, countPerson, searchButton);
 
         return filterLayout;
     }
 
     private void configureComboBoxCity() {
-        cityBox.setItems(List.of("Łódź", "Warszawa", "Kraków","Gdańsk","Wrocław","Poznań"));
+        cityBox.setItems(List.of("Łódź", "Warszawa", "Kraków", "Gdańsk", "Wrocław", "Poznań"));
         cityBox.isClearButtonVisible();
         cityBox.setPlaceholder("Dokąd się wybierasz");
     }
@@ -97,17 +94,17 @@ public class OffersView extends Main implements HasComponents, HasStyle, BeforeE
         apartments.forEach(apartment -> imageContainer.add(new OfferViewCard(apartment)));
     }
 
-    private void configListener(){
-        searchButton.addClickListener(e ->{
-           List<Apartment> apartments = apartmentService.findAll();
-           if(cityBox.getOptionalValue().isPresent()){
-               apartments = apartments.stream().filter(apartment -> apartment.getAddress().getCity().equals(cityBox.getOptionalValue().get().toString())).toList();
-           }
-           if(!countPerson.isEmpty()){
-               apartments = apartments.stream().filter(apartment -> apartment.getMaxPerson() == countPerson.getValue().intValue()).toList();
-           }
-           imageContainer.removeAll();
-           displayApartments(apartments);
+    private void configListener() {
+        searchButton.addClickListener(e -> {
+            List<Apartment> apartments = apartmentService.findAll();
+            if (cityBox.getOptionalValue().isPresent()) {
+                apartments = apartments.stream().filter(apartment -> apartment.getAddress().getCity().equals(cityBox.getOptionalValue().get())).toList();
+            }
+            if (!countPerson.isEmpty()) {
+                apartments = apartments.stream().filter(apartment -> apartment.getMaxPerson() == countPerson.getValue().intValue()).toList();
+            }
+            imageContainer.removeAll();
+            displayApartments(apartments);
         });
     }
 

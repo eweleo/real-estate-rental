@@ -1,8 +1,10 @@
 package com.example.application.views;
 
 import com.example.application.entity.Apartment;
+import com.example.application.entity.Reservation;
 import com.example.application.entity.User;
 import com.example.application.security.AuthenticatedUser;
+import com.example.application.security.ReservationService;
 import com.example.application.services.ApartmentService;
 import com.example.application.views.offers.OfferViewCard;
 import com.example.application.views.offers.OffersView;
@@ -22,6 +24,7 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.*;
 import com.vaadin.flow.theme.lumo.LumoUtility.*;
 import jakarta.annotation.security.PermitAll;
+import org.springframework.stereotype.Repository;
 
 import java.time.temporal.ChronoUnit;
 
@@ -46,17 +49,18 @@ public class CheckoutFormView extends Div implements HasUrlParameter<String>, Be
     private final Span counterDays = new Span();
     private final Span totalPrice = new Span();
     private final Button pay = new Button("Zapłać", new Icon(VaadinIcon.LOCK));
+    private final ReservationService reservationService;
 
-    User user;
+    private final User user;
 
 
-    public CheckoutFormView(ApartmentService apartmentService, AuthenticatedUser authenticatedUser) {
+    public CheckoutFormView(ApartmentService apartmentService, ReservationService reservationService, AuthenticatedUser authenticatedUser) {
         this.apartmentService = apartmentService;
+        this.reservationService = reservationService;
         user = authenticatedUser.get().get();
     }
 
     private void configView() {
-        addClassNames("checkout-form-view");
         addClassNames(Display.FLEX, FlexDirection.COLUMN, Height.FULL);
 
         Main content = new Main();
@@ -64,7 +68,7 @@ public class CheckoutFormView extends Div implements HasUrlParameter<String>, Be
                 Margin.Horizontal.AUTO, Padding.Bottom.LARGE, Padding.Horizontal.LARGE);
 
         content.add(createCheckoutForm());
-        content.add(createAside());
+        content.add(createSummary());
         content.add(new Hr());
         content.add(createFooter());
         add(content);
@@ -78,7 +82,7 @@ public class CheckoutFormView extends Div implements HasUrlParameter<String>, Be
         header.addClassNames(Margin.Bottom.NONE, Margin.Top.XLARGE, FontSize.XXXLARGE);
         checkoutForm.add(header);
         checkoutForm.add(new OfferViewCard(apartment));
-        checkoutForm.add(createShippingAddressSection());
+        checkoutForm.add(createDateSection());
         checkoutForm.add(createPersonalDetailsSection());
         checkoutForm.add(createPaymentInformationSection());
 
@@ -88,7 +92,6 @@ public class CheckoutFormView extends Div implements HasUrlParameter<String>, Be
     private Section createPersonalDetailsSection() {
         Section personalDetails = new Section();
         personalDetails.addClassNames(Display.FLEX, FlexDirection.COLUMN, Margin.Bottom.XLARGE, Margin.Top.MEDIUM);
-
 
         H3 header = new H3("Dane");
         header.addClassNames(Margin.Bottom.MEDIUM, Margin.Top.SMALL, FontSize.XXLARGE);
@@ -119,7 +122,7 @@ public class CheckoutFormView extends Div implements HasUrlParameter<String>, Be
         return personalDetails;
     }
 
-    private Section createShippingAddressSection() {
+    private Section createDateSection() {
         Section shippingDetails = new Section();
         shippingDetails.addClassNames(Display.FLEX, FlexDirection.COLUMN, Margin.Bottom.XLARGE, Margin.Top.MEDIUM);
 
@@ -197,7 +200,7 @@ public class CheckoutFormView extends Div implements HasUrlParameter<String>, Be
         return footer;
     }
 
-    private Aside createAside() {
+    private Aside createSummary() {
         Aside aside = new Aside();
         aside.addClassNames(Background.CONTRAST_5, BoxSizing.BORDER, Padding.LARGE, BorderRadius.LARGE,
                 Position.STICKY);
@@ -211,14 +214,14 @@ public class CheckoutFormView extends Div implements HasUrlParameter<String>, Be
         UnorderedList ul = new UnorderedList();
         ul.addClassNames(ListStyleType.NONE, Margin.NONE, Padding.NONE, Display.FLEX, FlexDirection.COLUMN, Gap.MEDIUM);
 
-        ul.add(createListItem(apartment.getTitle(), " "));
+        ul.add(createListItem(apartment.getTitle()));
 
 
         aside.add(headerSection, ul);
         return aside;
     }
 
-    private ListItem createListItem(String primary, String secondary) {
+    private ListItem createListItem(String primary) {
         ListItem item = new ListItem();
         item.addClassNames(Display.FLEX, JustifyContent.BETWEEN);
 
@@ -226,7 +229,7 @@ public class CheckoutFormView extends Div implements HasUrlParameter<String>, Be
         subSection.addClassNames(Display.FLEX, FlexDirection.COLUMN);
 
         subSection.add(new Span(primary));
-        Span secondarySpan = new Span(secondary);
+        Span secondarySpan = new Span(" ");
         secondarySpan.addClassNames(FontSize.SMALL, TextColor.SECONDARY);
         subSection.add(secondarySpan);
 
@@ -264,6 +267,7 @@ public class CheckoutFormView extends Div implements HasUrlParameter<String>, Be
                 Dialog dialog = new Dialog("Rezerwacja");
                 Span span = new Span("Transakcja została sfinalizowana, szczegóły dostaniesz na maila");
                 Button ok = new Button("OK", buttonClickEvent -> {
+                    createReservation();
                     dialog.close();
                     UI.getCurrent().navigate(OffersView.class);
                 });
@@ -272,6 +276,15 @@ public class CheckoutFormView extends Div implements HasUrlParameter<String>, Be
                 dialog.open();
             }
         });
+    }
+
+    private void createReservation(){
+        Reservation reservation = new Reservation();
+        reservation.setApartment(apartment);
+        reservation.setUser(user);
+        reservation.setDateFrom(dateFrom.getValue());
+        reservation.setDateTo(dateTo.getValue());
+        reservationService.save(reservation);
     }
 
     @Override

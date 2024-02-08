@@ -1,14 +1,8 @@
 package com.example.application.entity;
 
-import com.example.application.model.Category;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Max;
 import lombok.Getter;
 import lombok.Setter;
-
-import java.text.DecimalFormat;
-import java.util.List;
-import java.util.UUID;
 
 @Setter
 @Getter
