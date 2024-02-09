@@ -13,58 +13,20 @@ import com.vaadin.flow.component.menubar.MenuBar;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.router.RouterLink;
 import com.vaadin.flow.server.StreamResource;
-import com.vaadin.flow.server.auth.AccessAnnotationChecker;
 import com.vaadin.flow.theme.lumo.LumoUtility.*;
 
 import java.io.ByteArrayInputStream;
 import java.util.Optional;
 
 
-/**
- * The main view is a top-level placeholder for other views.
- */
 public class MainLayout extends AppLayout {
 
     private static final String URL = "/META-INF/resources/icons/baner.png";
 
-    /**
-     * A simple navigation item component, based on ListItem element.
-     */
-    public static class MenuItemInfo extends ListItem {
-
-        private final Class<? extends Component> view;
-
-        public MenuItemInfo(String menuTitle, Component icon, Class<? extends Component> view) {
-            this.view = view;
-            RouterLink link = new RouterLink();
-            // Use Lumo classnames for various styling
-            link.addClassNames(Display.FLEX, Gap.XSMALL, Height.MEDIUM, AlignItems.CENTER, Padding.Horizontal.SMALL,
-                    TextColor.BODY);
-            link.setRoute(view);
-
-            Span text = new Span(menuTitle);
-            // Use Lumo classnames for various styling
-            text.addClassNames(FontWeight.MEDIUM, FontSize.MEDIUM, Whitespace.NOWRAP);
-
-            if (icon != null) {
-                link.add(icon);
-            }
-            link.add(text);
-            add(link);
-        }
-
-        public Class<?> getView() {
-            return view;
-        }
-
-    }
-
     private final AuthenticatedUser authenticatedUser;
-    private final AccessAnnotationChecker accessChecker;
 
-    public MainLayout(AuthenticatedUser authenticatedUser, AccessAnnotationChecker accessChecker) {
+    public MainLayout(AuthenticatedUser authenticatedUser) {
         this.authenticatedUser = authenticatedUser;
-        this.accessChecker = accessChecker;
 
         addToNavbar(createHeaderContent());
         setDrawerOpened(false);
@@ -108,9 +70,6 @@ public class MainLayout extends AppLayout {
             div.getElement().getStyle().set("gap", "var(--lumo-space-s)");
             userName.add(div);
 
-//            userName.getSubMenu().addItem("Moje dane", e-> UI.getCurrent().navigate(MojedaneView.class));
-//            userName.getSubMenu().addItem("Moje ulubione", e-> UI.getCurrent().navigate(MojeulubioneView.class));
-//            userName.getSubMenu().addItem("Historia wynajmów", e -> UI.getCurrent().navigate(MyOffersView.class));
             userName.getSubMenu().addItem("Wyloguj się", e -> {
                 authenticatedUser.logout();
             });
@@ -124,7 +83,6 @@ public class MainLayout extends AppLayout {
         Nav nav = new Nav();
         nav.addClassNames(Display.FLEX, Overflow.AUTO, Padding.Horizontal.MEDIUM, Padding.Vertical.XSMALL);
 
-        // Wrap the links in a list; improves accessibility
         UnorderedList list = new UnorderedList();
         list.addClassNames(Display.FLEX, Gap.SMALL, ListStyleType.NONE, Margin.NONE, Padding.NONE);
         nav.add(list);

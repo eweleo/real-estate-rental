@@ -1,13 +1,15 @@
 package com.example.application.entity;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.ManyToOne;
 import lombok.Getter;
 import lombok.Setter;
 
 @Setter
 @Getter
 @Entity
-public class Apartment extends  AbstractEntity{
+public class Apartment extends AbstractEntity {
     private String uuid;
     private String title;
     @Column(length = 4000)

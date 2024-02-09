@@ -2,8 +2,6 @@ package com.example.application.views.offers;
 
 
 import com.example.application.entity.Apartment;
-import com.example.application.entity.Reservation;
-import com.example.application.security.ReservationService;
 import com.example.application.services.ApartmentService;
 import com.example.application.views.MainLayout;
 import com.vaadin.flow.component.HasComponents;
@@ -43,7 +41,7 @@ public class OffersView extends Main implements HasComponents, HasStyle, BeforeE
     private final NumberField countPerson = new NumberField();
     private final Button searchButton = new Button("Szukaj");
 
-    public OffersView(ApartmentService apartmentService, ReservationService reservationService) {
+    public OffersView(ApartmentService apartmentService) {
         this.apartmentService = apartmentService;
     }
 

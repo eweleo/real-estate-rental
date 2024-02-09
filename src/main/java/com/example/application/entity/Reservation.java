@@ -10,7 +10,7 @@ import java.time.LocalDate;
 @Entity
 @Getter
 @Setter
-public class Reservation extends AbstractEntity{
+public class Reservation extends AbstractEntity {
     @ManyToOne
     private User user;
     @ManyToOne

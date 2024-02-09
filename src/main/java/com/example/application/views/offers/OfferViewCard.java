@@ -7,7 +7,7 @@ import com.vaadin.flow.server.StreamResource;
 import com.vaadin.flow.theme.lumo.LumoUtility;
 
 public class OfferViewCard extends ListItem {
-    public OfferViewCard(Apartment apartment){
+    public OfferViewCard(Apartment apartment) {
         addClassNames(LumoUtility.Background.CONTRAST_5, LumoUtility.Display.FLEX, LumoUtility.FlexDirection.COLUMN, LumoUtility.AlignItems.START, LumoUtility.Padding.MEDIUM,
                 LumoUtility.BorderRadius.LARGE);
 
@@ -32,7 +32,7 @@ public class OfferViewCard extends ListItem {
         subtitle.setText(apartment.getPrice() + "zł/ dzień");
 
         Paragraph description = new Paragraph(
-                apartment.getDescription().substring(0,200) + "...");
+                apartment.getDescription().substring(0, 200) + "...");
         description.addClassName(LumoUtility.Margin.Vertical.MEDIUM);
 
         Span badge = new Span();

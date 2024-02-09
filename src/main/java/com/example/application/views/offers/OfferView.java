@@ -34,7 +34,7 @@ public class OfferView extends Div implements HasUrlParameter<String>, BeforeEnt
 
     private final Button reserveButton = new Button("Zarezerwuj");
 
-    private void  configListener(){
+    private void configListener() {
         reserveButton.addClickListener(event -> UI.getCurrent().navigate(CheckoutFormView.class, apartment.getUuid()));
     }
 

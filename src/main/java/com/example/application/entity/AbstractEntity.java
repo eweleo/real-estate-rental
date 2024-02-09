@@ -1,11 +1,6 @@
 package com.example.application.entity;
 
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.MappedSuperclass;
-import jakarta.persistence.SequenceGenerator;
-import jakarta.persistence.Version;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -30,7 +25,7 @@ public abstract class AbstractEntity {
     @Override
     public boolean equals(Object obj) {
         if (!(obj instanceof AbstractEntity that)) {
-            return false; // null or not an AbstractEntity class
+            return false;
         }
         if (getId() != null) {
             return getId().equals(that.getId());

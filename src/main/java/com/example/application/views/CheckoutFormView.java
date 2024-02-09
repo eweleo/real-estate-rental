@@ -24,7 +24,6 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.*;
 import com.vaadin.flow.theme.lumo.LumoUtility.*;
 import jakarta.annotation.security.PermitAll;
-import org.springframework.stereotype.Repository;
 
 import java.time.temporal.ChronoUnit;
 
@@ -278,7 +277,7 @@ public class CheckoutFormView extends Div implements HasUrlParameter<String>, Be
         });
     }
 
-    private void createReservation(){
+    private void createReservation() {
         Reservation reservation = new Reservation();
         reservation.setApartment(apartment);
         reservation.setUser(user);
