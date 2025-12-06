@@ -6,13 +6,13 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.List;
+import java.util.Set;
 
 @Getter
 @Setter
 @Entity
 @Table(name = "application_user")
 public class User extends AbstractEntity {
-    private String username;
     @JsonIgnore
     private String hashedPassword;
     @Lob
@@ -24,4 +24,11 @@ public class User extends AbstractEntity {
     private String telephoneNumber;
     @OneToMany
     private List<Apartment> observed;
+    @ElementCollection
+    private Set<Role> roles;
+    private String street;
+    private Integer streetNumber;
+    private Integer flatNumber;
+    private String city;
+    private String zipCode;
 }

@@ -4,14 +4,15 @@ import com.example.application.entity.Apartment;
 import com.example.application.entity.Reservation;
 import com.example.application.entity.User;
 import com.example.application.security.AuthenticatedUser;
-import com.example.application.security.ReservationService;
 import com.example.application.services.ApartmentService;
+import com.example.application.services.ReservationService;
 import com.example.application.views.offers.OfferViewCard;
 import com.example.application.views.offers.OffersView;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.html.*;
@@ -20,12 +21,15 @@ import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.component.textfield.EmailField;
+import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.*;
 import com.vaadin.flow.theme.lumo.LumoUtility.*;
 import jakarta.annotation.security.PermitAll;
 
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.List;
 
 @PageTitle("Checkout Form")
 @PermitAll
@@ -49,6 +53,8 @@ public class CheckoutFormView extends Div implements HasUrlParameter<String>, Be
     private final Span totalPrice = new Span();
     private final Button pay = new Button("Zapłać", new Icon(VaadinIcon.LOCK));
     private final ReservationService reservationService;
+    private final ComboBox<String> currencyBox = new ComboBox<>();
+    private Double baseCurrencyPrice;
 
     private final User user;
 
@@ -65,7 +71,6 @@ public class CheckoutFormView extends Div implements HasUrlParameter<String>, Be
         Main content = new Main();
         content.addClassNames(Display.GRID, Gap.XLARGE, AlignItems.START, JustifyContent.CENTER, MaxWidth.SCREEN_MEDIUM,
                 Margin.Horizontal.AUTO, Padding.Bottom.LARGE, Padding.Horizontal.LARGE);
-
         content.add(createCheckoutForm());
         content.add(createSummary());
         content.add(new Hr());
@@ -86,6 +91,16 @@ public class CheckoutFormView extends Div implements HasUrlParameter<String>, Be
         checkoutForm.add(createPaymentInformationSection());
 
         return checkoutForm;
+    }
+
+    private void prepareCurrencyBox() {
+        List<String> items = new ArrayList<>();
+        items.add("EUR");
+        items.add("PLN");
+        items.add("USD");
+        items.add("GBP");
+        currencyBox.setItems(items);
+        currencyBox.setValue("PLN");
     }
 
     private Section createPersonalDetailsSection() {
@@ -231,9 +246,9 @@ public class CheckoutFormView extends Div implements HasUrlParameter<String>, Be
         Span secondarySpan = new Span(" ");
         secondarySpan.addClassNames(FontSize.SMALL, TextColor.SECONDARY);
         subSection.add(secondarySpan);
+        prepareCurrencyBox();
 
-
-        item.add(subSection, counterDays, totalPrice);
+        item.add(subSection, counterDays, totalPrice, currencyBox);
         return item;
     }
 
@@ -242,8 +257,9 @@ public class CheckoutFormView extends Div implements HasUrlParameter<String>, Be
             int days = (int) ChronoUnit.DAYS.between(dateFrom.getValue(), dateTo.getValue());
             counterDays.setVisible(true);
             counterDays.setText(days + " dni");
+            baseCurrencyPrice = days * apartment.getPrice();
             totalPrice.setVisible(true);
-            totalPrice.setText(days * apartment.getPrice() + " zł");
+            changeCurrency(currencyBox.getValue());
         } else {
             counterDays.setVisible(false);
             totalPrice.setVisible(false);
@@ -275,6 +291,7 @@ public class CheckoutFormView extends Div implements HasUrlParameter<String>, Be
                 dialog.open();
             }
         });
+        currencyBox.addValueChangeListener(event -> changeCurrency(event.getValue()));
     }
 
     private void createReservation() {
@@ -284,6 +301,17 @@ public class CheckoutFormView extends Div implements HasUrlParameter<String>, Be
         reservation.setDateFrom(dateFrom.getValue());
         reservation.setDateTo(dateTo.getValue());
         reservationService.save(reservation);
+    }
+
+    private void changeCurrency(String currencyCode) {
+        {
+            if (currencyCode.equals("PLN")) {
+                totalPrice.setText(baseCurrencyPrice.toString());
+            } else {
+                double currencyPrice = Math.round(baseCurrencyPrice/reservationService.getRateCurrency(currencyCode) * 100.0) / 100.0;
+                totalPrice.setText(String.valueOf(currencyPrice));
+            }
+        }
     }
 
     @Override
