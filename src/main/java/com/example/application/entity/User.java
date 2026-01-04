@@ -1,6 +1,7 @@
 package com.example.application.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.helger.commons.annotation.LazilyInitialized;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -24,11 +25,17 @@ public class User extends AbstractEntity {
     private String telephoneNumber;
     @OneToMany
     private List<Apartment> observed;
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)  // EAGER loading
+    @CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"))
+    @Column(name = "role")
     private Set<Role> roles;
-    private String street;
-    private Integer streetNumber;
-    private Integer flatNumber;
-    private String city;
-    private String zipCode;
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "address_id")
+    private Address address;
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Company company;
+
+    public boolean isLandlord(){
+        return roles.contains(Role.LANDLORD);
+    }
 }

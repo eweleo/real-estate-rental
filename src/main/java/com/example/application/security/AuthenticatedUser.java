@@ -18,28 +18,12 @@ public class AuthenticatedUser {
     public AuthenticatedUser(AuthenticationContext authenticationContext, UserRepository userRepository) {
         this.userRepository = userRepository;
         this.authenticationContext = authenticationContext;
-        System.out.println("AuthenticatedUser created - UserRepository: " + (userRepository != null ? "OK" : "NULL"));
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public Optional<User> get() {
-        System.out.println("AuthenticatedUser.get() called");
-        System.out.println("UserRepository is: " + (userRepository != null ? "OK" : "NULL"));
-
-        Optional<UserDetails> userDetailsOpt = authenticationContext.getAuthenticatedUser(UserDetails.class);
-        System.out.println("UserDetails present: " + userDetailsOpt.isPresent());
-
-        if (userDetailsOpt.isPresent()) {
-            String email = userDetailsOpt.get().getUsername();
-            System.out.println("Email from UserDetails: " + email);
-
-            User user = userRepository.findByEmail(email);
-            System.out.println("User found: " + (user != null ? user.getEmail() : "NULL"));
-
-            return Optional.ofNullable(user);
-        }
-
-        return Optional.empty();
+        return authenticationContext.getAuthenticatedUser(UserDetails.class)
+                .flatMap(userDetails -> userRepository.findByEmail(userDetails.getUsername()));
     }
 
     public void logout() {

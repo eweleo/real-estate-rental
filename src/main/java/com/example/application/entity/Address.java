@@ -9,8 +9,7 @@ import lombok.Setter;
 @Entity
 public class Address extends AbstractEntity {
     private String street;
-    private String streetNumber;
-    private String apartmentNumber;
     private String zipCode;
-    private String City;
+    private String city;
+    private String country;
 }

@@ -13,14 +13,12 @@ import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.EmailField;
 import com.vaadin.flow.component.textfield.PasswordField;
-import com.vaadin.flow.router.BeforeEnterEvent;
-import com.vaadin.flow.router.BeforeEnterObserver;
-import com.vaadin.flow.router.PageTitle;
-import com.vaadin.flow.router.Route;
-import com.vaadin.flow.router.RouterLink;
+import com.vaadin.flow.router.*;
 import com.vaadin.flow.server.VaadinServletRequest;
 import com.vaadin.flow.server.VaadinServletResponse;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -28,9 +26,6 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
-
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 
 @AnonymousAllowed
 @PageTitle("Logowanie")
@@ -42,7 +37,6 @@ public class LoginView extends Div implements BeforeEnterObserver {
 
     private EmailField email;
     private PasswordField password;
-    private Button loginButton;
 
     public LoginView(AuthenticatedUser authenticatedUser, AuthenticationManager authenticationManager) {
         this.authenticatedUser = authenticatedUser;
@@ -93,14 +87,13 @@ public class LoginView extends Div implements BeforeEnterObserver {
         password.setRequired(true);
         password.getStyle().set("margin-bottom", "20px");
 
-        // Dodaj obsługę Enter
         password.addKeyPressListener(event -> {
             if (event.getKey().getKeys().contains("Enter")) {
                 handleLogin();
             }
         });
 
-        loginButton = new Button("Zaloguj się", e -> handleLogin());
+        Button loginButton = new Button("Zaloguj się", e -> handleLogin());
         loginButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_LARGE);
         loginButton.setWidth("100%");
         loginButton.getStyle()
@@ -145,19 +138,16 @@ public class LoginView extends Div implements BeforeEnterObserver {
 
             System.out.println("Próba logowania dla: " + emailValue);
 
-            // Autentykacja
             UsernamePasswordAuthenticationToken authReq =
                     new UsernamePasswordAuthenticationToken(emailValue, passwordValue);
             Authentication auth = authenticationManager.authenticate(authReq);
 
             System.out.println("Autentykacja udana: " + auth.isAuthenticated());
 
-            // Ustaw kontekst bezpieczeństwa
             SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
             securityContext.setAuthentication(auth);
             SecurityContextHolder.setContext(securityContext);
 
-            // Pobierz request i response
             VaadinServletRequest vaadinRequest = VaadinServletRequest.getCurrent();
             VaadinServletResponse vaadinResponse = VaadinServletResponse.getCurrent();
 
@@ -165,7 +155,6 @@ public class LoginView extends Div implements BeforeEnterObserver {
                 HttpServletRequest request = vaadinRequest.getHttpServletRequest();
                 HttpServletResponse response = vaadinResponse.getHttpServletResponse();
 
-                // Zapisz kontekst w sesji
                 request.getSession().setAttribute(
                         HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY,
                         securityContext
@@ -176,7 +165,6 @@ public class LoginView extends Div implements BeforeEnterObserver {
 
             showNotification("Zalogowano pomyślnie!", NotificationVariant.LUMO_SUCCESS);
 
-            // Nawiguj do strony głównej z opóźnieniem
             UI.getCurrent().access(() -> {
                 UI.getCurrent().navigate("");
                 UI.getCurrent().getPage().reload();

@@ -1,5 +1,5 @@
 package com.example.application.entity;
 
 public enum Role {
-    USER, ADMIN,SELLER;
+    USER, ADMIN,LANDLORD;
 }

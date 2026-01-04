@@ -1,6 +1,7 @@
 package com.example.application.security;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import com.example.application.entity.User;
@@ -25,12 +26,12 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     @Override
     @Transactional
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        User user = userRepository.findByEmail(email);
-        if (user == null) {
+        Optional<User> user = userRepository.findByEmail(email);
+        if (user.isEmpty()) {
             throw new UsernameNotFoundException("No user present with email: " + email);
         } else {
-            return new org.springframework.security.core.userdetails.User(user.getEmail(), user.getHashedPassword(),
-                    getAuthorities(user));
+            return new org.springframework.security.core.userdetails.User(user.get().getEmail(), user.get().getHashedPassword(),
+                    getAuthorities(user.get()));
         }
     }
 

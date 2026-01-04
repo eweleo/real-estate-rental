@@ -29,14 +29,13 @@ import com.vaadin.flow.server.auth.AnonymousAllowed;
 public class RegisterView extends Div {
 
     private final UserService userService;
-    private Binder<User> binder;
+    private final Binder<User> binder;
 
     private TextField firstName;
     private TextField lastName;
     private EmailField email;
     private PasswordField password;
     private PasswordField confirmPassword;
-    private Button registerButton;
 
     public RegisterView(UserService userService) {
         this.userService = userService;
@@ -101,13 +100,36 @@ public class RegisterView extends Div {
         confirmPassword.setRequired(true);
         confirmPassword.getStyle().set("margin-bottom", "20px");
 
-        registerButton = new Button("Zarejestruj się", e -> handleRegistration());
+        Button registerButton = new Button("Zarejestruj się", e -> handleRegistration());
         registerButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_LARGE);
         registerButton.setWidth("100%");
         registerButton.getStyle()
                 .set("background", "linear-gradient(135deg, #667eea 0%, #764ba2 100%)")
                 .set("border", "none")
                 .set("margin-bottom", "10px");
+
+        Div landlordSection = new Div();
+        landlordSection.getStyle()
+                .set("text-align", "center")
+                .set("padding", "15px 0")
+                .set("background-color", "#f8f9fa")
+                .set("border-radius", "6px")
+                .set("margin-top", "10px");
+
+        Paragraph landlordText = new Paragraph("Chcesz wynajmować nieruchomości?");
+        landlordText.getStyle()
+                .set("margin", "0 0 10px 0")
+                .set("color", "#666")
+                .set("font-size", "14px");
+
+        RouterLink landlordLink = new RouterLink("Zarejestruj się jako wynajmujący", LandlordRegisterView.class);
+        landlordLink.getStyle()
+                .set("color", "#667eea")
+                .set("text-decoration", "none")
+                .set("font-weight", "600")
+                .set("font-size", "14px");
+
+        landlordSection.add(landlordText, landlordLink);
 
         Div loginSection = new Div();
         loginSection.getStyle()
@@ -138,6 +160,7 @@ public class RegisterView extends Div {
                 password,
                 confirmPassword,
                 registerButton,
+                landlordSection,
                 loginSection
         );
 
@@ -169,7 +192,8 @@ public class RegisterView extends Div {
                 .withValidator(pass -> pass.matches(".*[A-Z].*"), "Hasło musi zawierać co najmniej jedną wielką literę")
                 .withValidator(pass -> pass.matches(".*[a-z].*"), "Hasło musi zawierać co najmniej jedną małą literę")
                 .withValidator(pass -> pass.matches(".*\\d.*"), "Hasło musi zawierać co najmniej jedną cyfrę")
-                .bind(user -> "", (user, pass) -> {});
+                .bind(user -> "", (user, pass) -> {
+                });
     }
 
     private void handleRegistration() {
